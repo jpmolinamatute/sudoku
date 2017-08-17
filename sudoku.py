@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-
+from sys import exit
 from random import randrange
 
 
@@ -45,11 +45,6 @@ class Sudoku:
             self.posibleValues.remove(num)
 
         return num
-
-    def resetNumbers(self):
-        for num in range(0, 9):
-            print(num, self.posibleValues[num])
-            self.posibleValues[num] = num + 1
 
     def printGrid(self):
         for section in range(0, 9):
@@ -104,21 +99,38 @@ class Sudoku:
         return col and row and section
 
     def navigate(self):
-        for point in self.grid:
-            valid = True
-            while valid:
-                randNumber = self.getNumber()
-                if randNumber is None:
+        restart = True
+        while restart:
+            breakForLoop = False
+            for point in self.grid:
+                valid = True
+                while valid:
+                    randNumber = self.getNumber()
+                    if randNumber is None:
+                        valid = False
+                        breakForLoop = True
+                    elif self.checkRules(point, randNumber):
+                        self.grid[point] = randNumber
+                        self.posibleValues = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+                        valid = False
+                        if point == "s9p9":
+                            breakForLoop = True
+                            restart = False
+                if breakForLoop:
                     break
-                    # self.clearTable()
-                    # self.resetNumbers()
-                elif self.checkRules(point, randNumber):
-                    self.grid[point] = randNumber
-                    self.resetNumbers()
-                    valid = False
+
+
+def startPoint():
+    try:
+        sudoku = Sudoku()
+        # sudoku.navigate()
+        # sudoku.printGrid()
+        exit(0)
+    except KeyboardInterrupt:
+        print("", flush=True)
+        sudoku.printGrid()
+        exit(1)
 
 
 if __name__ == "__main__":
-    sudoku = Sudoku()
-    sudoku.navigate()
-    sudoku.printGrid()
+    startPoint()
