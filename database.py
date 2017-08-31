@@ -1,20 +1,31 @@
 #!/usr/bin/env python
 
 from sys import exit
+import argparse
 from pymongo import MongoClient
+from pymongo import errors
 from sudoku import Sudoku
 
 
 class DataBase:
     db = None
 
-    def __init__(self, host, port, user, password, db):
+    def __init__(self, host, port, db, user, password):
+        maxSevSelDelay = 1
         if user and password:
             mongoURL = "mongodb://" + user + ":" + password + "@"
         else:
             mongoURL = "mongodb://"
         mongoURL += host + ":" + port + "/" + db
-        self.db = MongoClient(mongoURL)[db]
+        try:
+            client = MongoClient(mongoURL, serverSelectionTimeoutMS=maxSevSelDelay)
+            client.server_info()
+        except errors.ServerSelectionTimeoutError as err:
+            print("Connection to " + host + ":" + port + "/" + db + " failed")
+            print(err)
+            exit(1)
+        else:
+            self.db = MongoClient(mongoURL)[db]
 
     def checkSudoku(self, sudoku):
         if isinstance(sudoku, dict):
@@ -56,7 +67,15 @@ class DataBase:
 
 def startPoint():
     try:
-        db = DataBase("localhost", "27017", "tester", "test", "webui-test")
+        parser = argparse.ArgumentParser(description='Create and Save Sudoku boards')
+        parser.add_argument('--host', required=True, help='DB Host')
+        parser.add_argument('--port', required=True, help='DB Port')
+        parser.add_argument('--db', required=True, help='DB Name')
+        parser.add_argument('--user', help='DB User')
+        parser.add_argument('--password', help='DB Password')
+        args = parser.parse_args()
+
+        db = DataBase(args.host, args.port, args.db, args.user, args.password)
         keepgoing = True
         while keepgoing:
             sudoku = db.createSudoku()
