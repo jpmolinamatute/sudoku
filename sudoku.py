@@ -151,3 +151,6 @@ class Sudoku:
             str(self.grid["S7P7"]) + " " + str(self.grid["S7P8"]) + " " + str(self.grid["S7P9"]) + " |  " +\
             str(self.grid["S8P7"]) + " " + str(self.grid["S8P8"]) + " " + str(self.grid["S8P9"]) + " |  " + \
             str(self.grid["S9P7"]) + " " + str(self.grid["S9P8"]) + " " + str(self.grid["S9P9"]) + "\n"
+
+    def getSudoku(self):
+        return self.grid
