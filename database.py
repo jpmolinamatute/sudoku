@@ -65,7 +65,7 @@ class DataBase:
             print(document)
 
 
-def startPoint():
+if __name__ == "__main__":
     try:
         parser = argparse.ArgumentParser(description='Create and Save Sudoku boards')
         parser.add_argument('--host', required=True, help='DB Host')
@@ -87,7 +87,3 @@ def startPoint():
     except Exception as e:
         print(e)
         exit(1)
-
-
-if __name__ == "__main__":
-    startPoint()
