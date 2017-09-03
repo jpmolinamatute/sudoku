@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from sys import exit
+from bson.objectid import ObjectId
 import argparse
 from pymongo import MongoClient
 from pymongo import errors
@@ -45,7 +46,7 @@ class DataBase:
             raise Exception("Invalid sudoku format")
 
     def createSudoku(self):
-        sud = Sudoku()
+        sud = Sudoku(True)
         return sud.getSudoku()
 
     def insertSudoku(self, board):
@@ -60,9 +61,12 @@ class DataBase:
         return valid
 
     def printCollection(self):
-        cursor = self.db.sudoku.find()
-        for document in cursor:
-            print(document)
+        board = self.db.sudoku.find_one({"_id": ObjectId("59a840360df34b2c57398e98")})
+        if "_id" in board:
+            del board["_id"]
+        sud = Sudoku(False)
+        sud.setSudoku(board)
+        print(sud)
 
 
 if __name__ == "__main__":
@@ -76,10 +80,11 @@ if __name__ == "__main__":
         args = parser.parse_args()
 
         db = DataBase(args.host, args.port, args.db, args.user, args.password)
-        keepgoing = True
-        while keepgoing:
-            sudoku = db.createSudoku()
-            keepgoing = db.insertSudoku(sudoku)
+        db.printCollection()
+        # keepgoing = True
+        # while keepgoing:
+        #     sudoku = db.createSudoku()
+        #     keepgoing = db.insertSudoku(sudoku)
         exit(0)
     except KeyboardInterrupt:
         print("Stopped by Keysstroke")
