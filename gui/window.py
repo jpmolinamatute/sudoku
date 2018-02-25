@@ -336,6 +336,9 @@ class Example(QWidget):
         }
     }
     db = MongoClient("mongodb://tester:test@localhost:27017/webui-test")["webui-test"]
+    numberSelected = None
+    indexSelected = None
+    button = {}
 
     def __init__(self):
         super().__init__()
@@ -358,9 +361,29 @@ class Example(QWidget):
             index = "S" + str(i + 1) + "P" + str(j + 1)
             label = board[index]
             position = self.gridMap[index]
-            button = QPushButton(str(label))
+            self.button[index] = QPushButton(str(label))
+            self.button[index].setFixedWidth(30)
+            self.button[index].clicked.connect(self.selectIndex(index))
+            grid.addWidget(self.button[index], position["yAxis"], position["xAxis"])
+
+        for i in range(9):
+            index = str(i + 1)
+            button = QPushButton(index)
             button.setFixedWidth(30)
-            grid.addWidget(button, position["yAxis"], position["xAxis"])
+            button.clicked.connect(self.selectNumber(index))
+            grid.addWidget(button, 10, i)
+
+    def selectIndex(self, index):
+        def printSelectIndex():
+            self.indexSelected = index
+            print("numberSelected ", self.numberSelected, self.indexSelected)
+        return printSelectIndex
+
+    def selectNumber(self, index):
+        def printSelectNumber():
+            self.numberSelected = index
+            print("indexSelected ", self.numberSelected, self.indexSelected)
+        return printSelectNumber
 
     def initUI(self):
         self.setWindowTitle('Sudoku')
@@ -376,9 +399,11 @@ class Example(QWidget):
         self.center()
         self.show()
 
+    def getValues(self):
+        return self.numberSelected + "   " + self.indexSelected
+
 
 if __name__ == '__main__':
-
     app = QApplication(sys.argv)
     ex = Example()
     sys.exit(app.exec_())
