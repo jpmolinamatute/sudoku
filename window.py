@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 
-import sys
+
 import itertools
-from bson.objectid import ObjectId
-from pymongo import MongoClient
-from PyQt5.QtWidgets import (QWidget, QPushButton, QToolTip, QDesktopWidget, QApplication, QGridLayout)
+from PyQt5.QtWidgets import (
+    QWidget, QPushButton, QToolTip, QDesktopWidget, QGridLayout)
 from PyQt5.QtGui import (QFont, QIcon)
 
 
@@ -335,14 +334,13 @@ class Example(QWidget):
             "yAxis": 8
         }
     }
-    db = MongoClient("mongodb://tester:test@localhost:27017/webui-test")["webui-test"]
     numberSelected = None
     indexSelected = None
     button = {}
 
-    def __init__(self):
+    def __init__(self, board):
         super().__init__()
-        self.initUI()
+        self.initUI(board)
 
     def center(self):
         qr = self.frameGeometry()
@@ -350,13 +348,9 @@ class Example(QWidget):
         qr.moveCenter(cp)
         self.move(qr.topLeft())
 
-    def getBoard(self):
-        return self.db.sudoku.find_one({"_id": ObjectId("59a840360df34b2c57398e98")})
-
-    def createGrid(self):
+    def createGrid(self, board):
         grid = QGridLayout()
         self.setLayout(grid)
-        board = self.getBoard()
         for i, j in itertools.product(range(9), repeat=2):
             index = "S" + str(i + 1) + "P" + str(j + 1)
             label = board[index]
@@ -364,7 +358,8 @@ class Example(QWidget):
             self.button[index] = QPushButton(str(label))
             self.button[index].setFixedWidth(30)
             self.button[index].clicked.connect(self.selectIndex(index))
-            grid.addWidget(self.button[index], position["yAxis"], position["xAxis"])
+            grid.addWidget(self.button[index],
+                           position["yAxis"], position["xAxis"])
 
         for i in range(9):
             index = str(i + 1)
@@ -385,13 +380,13 @@ class Example(QWidget):
             print("indexSelected ", self.numberSelected, self.indexSelected)
         return printSelectNumber
 
-    def initUI(self):
+    def initUI(self, board):
         self.setWindowTitle('Sudoku')
         self.resize(300, 300)
         self.setWindowIcon(QIcon('web.png'))
         QToolTip.setFont(QFont('SansSerif', 10))
         self.setToolTip('<b>Sudoku</b> Game')
-        self.createGrid()
+        self.createGrid(board)
         # btn = QPushButton('1', self)
         # btn.setToolTip('S1P1')
         # btn.resize(30, 30)
@@ -401,9 +396,3 @@ class Example(QWidget):
 
     def getValues(self):
         return self.numberSelected + "   " + self.indexSelected
-
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    ex = Example()
-    sys.exit(app.exec_())

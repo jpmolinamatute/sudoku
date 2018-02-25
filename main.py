@@ -2,6 +2,9 @@
 
 from connection import Connection
 from sudoku import Sudoku
+from window import Example
+from PyQt5.QtWidgets import QApplication
+import sys
 
 
 class Main:
@@ -23,10 +26,14 @@ if __name__ == "__main__":
         if grid is None:
             myMain.createSudoku()
             myMain.db.insertGrid(myMain.sud.getSudoku())
-            print(myMain.sud)
+            # print(myMain.sud)
         else:
-            myMain.printCollection(grid)
-        exit(0)
+            myMain.sud.setSudoku(grid)
+            # myMain.printCollection(grid)
+
+        app = QApplication(sys.argv)
+        ex = Example(myMain.sud.getSudoku())
+        sys.exit(app.exec_())
     except KeyboardInterrupt:
         print("Stopped by Keysstroke")
         exit(1)
