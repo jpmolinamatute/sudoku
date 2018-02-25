@@ -7,32 +7,21 @@ from PyQt5.QtWidgets import QApplication
 import sys
 
 
-class Main:
-    db = Connection('localhost', '27017', 'sudoku', 'sud', 'vzla')
-    sud = Sudoku()
-
-    def createSudoku(self):
-        return self.sud.createSudoku()
-
-    def printCollection(self, grid):
-        self.sud.setSudoku(grid)
-        print(self.sud)
-
-
 if __name__ == "__main__":
     try:
-        myMain = Main()
-        grid = myMain.db.getGrid()
+        db = Connection('localhost', '27017', 'sudoku', 'sud', 'vzla')
+        sud = Sudoku()
+        grid = db.getGrid()
         if grid is None:
-            myMain.createSudoku()
-            myMain.db.insertGrid(myMain.sud.getSudoku())
-            # print(myMain.sud)
+            sud.createSudoku()
+            grid = sud.getSudoku()
+            db.insertGrid(grid)
         else:
-            myMain.sud.setSudoku(grid)
-            # myMain.printCollection(grid)
+            sud.setSudoku(grid)
 
+        # print(sud)
         app = QApplication(sys.argv)
-        ex = Example(myMain.sud.getSudoku())
+        ex = Example(grid)
         sys.exit(app.exec_())
     except KeyboardInterrupt:
         print("Stopped by Keysstroke")
